@@ -19,7 +19,6 @@ $$
 p_m = avg(y_i), \ \ y_i\epsilon sub_m 
 $$
 &ensp;&ensp;&ensp;取均值时，均方误差最小。目标是确定m个结点所用特征k及其阈值$thr_m$，直接根据均方误差最小化来优化，复杂度太高，无法实现。采用贪心算法，一个一个确定，每个都取最优。每一步的优化可以用下面的公式来表示，**（问题 1.，2.）**
-
 $$cost_m = \min _{k,thr}\left[\min _{p_1} \sum_{}\left(y_{i}-p_{1}\right)^{2}+\min_{p_2}\sum_{}\left(y_{i}-p_{2}\right)^{2}\right]$$
 &ensp;&ensp;&ensp;具体来说就是枚举，比如说，每个特征$k$都对当前数据集确定最优的$thr$，再取其中最大的$k$。（不太聪明的方法~）
 
@@ -34,8 +33,6 @@ $$\min_{\alpha,M}C=\sum_{m}^{M}cost_m+\alpha|M|$$
 ## 分类树
 
 &ensp;&ensp;&ensp;分类树只需更换损失函数
-
-
 $$
 \begin{aligned}
 &\text { Misclassification error: } \quad \frac{1}{N_{m}} \sum_{i \in R_{m}} I\left(y_{i} \neq k(m)\right)=1-\hat{p}_{m k(m)}\\
