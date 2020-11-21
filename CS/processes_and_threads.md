@@ -93,6 +93,37 @@ TSL RX, LOCK
 1. 睡眠指令的丢失。这就相当于没加锁，会出现竞争。
 2. 叫醒指令的丢失。每个进程会有自己的缓存，他们不会每次都去读共享锁变量。只有当收到叫醒指令时候，会去读共享锁变量，如果叫醒指令丢失，根据软件设计的lazy原则，进程会选择读自己的缓存，这时虽然共享锁变量更新了，让它运行，但它不知道，它依旧按照自己的想法，继续睡。最后的结果就是内存爆掉，或者读不存在的变量，或者死锁。
 
+```C
+/*缓冲区中的槽数目*/
+#define N 100
+/*缓冲区中的数据项数目*/
+int count = 0;
+
+void producer(void)
+{
+    int item;
+    while(true)
+    {
+        item = produce_item();
+        if(count == N) sleep();                 /*检查缓冲区是否已满*/
+        insert_item(item);  count = count + 1;  /*更新*/     
+        if(count == 1) wakeup(consumer);           /*只要缓冲区有数据，就可以消费*/
+    }
+}
+
+void consumer(void)
+{
+    int item;
+
+    while(true)
+    {
+        if(count == 0) sleep();
+        item = remove_item(); count = count - 1; /*更新*/
+        if(count == N-1) wakeup(producer);
+        consume_item(item);
+    }
+}
+```
 #### 信号量
 
 通过分析，该问题的关键就是每次要用到一个关键的锁变量的时候，一定要保证这是最新的产品。
@@ -104,6 +135,47 @@ TSL RX, LOCK
 down: 如果信号量大于0，则减一；如果等于0，睡之~ 
 
 up: 信号量加一。所有进程都在睡。也包括自己，比如说自己先down一波，然后自己睡了。那么就会按照某种准则选取一个进程运行。
+```C
+#define N /*缓冲区的槽数目*/
+typedef int signal;
+signal mutex = 1;   /*一个锁，控制对临界区的访问*/
+signal emptyNum = N;   /*空槽数目*/
+signal fullNum = 0;    /*满槽数目*/
+
+void prodecer(void)
+{
+    int item;
+
+    while(true)
+    {
+        item = produce_item();
+        down(&empty);
+        down(&mutex);
+        insert_item(item);
+        up(&mutex);
+        up(&full);
+    }
+}
+
+void consumer(void)
+{
+    int item;
+
+    while(true)
+    {
+        down(&full);
+        down(&mutex);
+        item = remove_item();
+        up(&mutex);
+        up(&empty);
+        consume_item(item);
+    }
+}
+```
+
+mutex是用来**互斥**，它用来保证任一时刻只有一个进程读写缓冲区和相关的变量。互斥是避免混乱的必要操作。
+
+full和empty用来实现**同步**，保证某种事件的顺序发生或不发生。在本例中，它们保证在缓冲区满的时候生产者停止运行，以及当缓冲区空的时候消费者停止运行。
 
 #### 互斥量
 

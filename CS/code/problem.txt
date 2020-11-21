@@ -1,0 +1,15 @@
+尝试运行CrackMe.exe
+根据提示输入1个参数（范围100-999）进行破解
+如果失败会提示
+    wrong password
+如果成功会提示  
+    cracked
+
+所以目标是获取正确的密码破解CrackMe.exe软件
+
+
+提示：
+破解的方式有很多种，如果尝试用暴力破解方式来处理可以参考如下文档：
+    如何用c++ windows代码调用程序并获取其返回值
+    https://blog.csdn.net/VonSdite/article/details/81295056?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~first_rank_v2~rank_v28-5-81295056.nonecase&utm_term=c++%20%E8%8E%B7%E5%8F%96%E7%B3%BB%E7%BB%9F%E5%91%BD%E4%BB%A4%E8%BF%94%E5%9B%9E%E7%BB%93%E6%9E%9C&spm=1000.2123.3001.4430
+当然不仅限于只使用c++，只要能获取密码即可
